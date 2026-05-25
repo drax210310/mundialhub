@@ -1,0 +1,51 @@
+name: Java CI/CD con Maven y SonarCloud
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Compilacion y Analisis de Calidad
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Descargar codigo del repositorio
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Requerido por SonarCloud para un mejor analisis
+
+    - name: 2. Configurar JDK 17 (Java de tu proyecto)
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: 3. Cache de paquetes de SonarCloud
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: 4. Compilar y Ejecutar Pruebas Unitarias
+      run: mvn -B test --file pom.xml
+
+    - name: 5. Analisis de Calidad con SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # 🔥 AQUÍ ESTÁN TUS CLAVES EXACTAS DE SONARCLOUD
+      run: mvn -B verify sonar:sonar -Dsonar.projectKey=drax210310_mundialhub -Dsonar.organization=drax210310 -Dsonar.host.url=https://sonarcloud.io
+
+    - name: 6. Empaquetar Artefacto (JAR)
+      run: mvn -B package -DskipTests --file pom.xml
+
+    - name: 7. Subir el archivo JAR generado
+      uses: actions/upload-artifact@v4
+      with:
+        name: mundial-hub-app
+        path: target/*.jar

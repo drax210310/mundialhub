@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Usuario - Mundial HUB</title>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+body {
+	background: #f4f7fc;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar-custom {
+	background: linear-gradient(90deg, #0d6efd, #6610f2);
+}
+
+.navbar-brand {
+	font-weight: bold;
+	color: white !important;
+}
+
+.card {
+	border: none;
+	border-radius: 18px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table {
+	vertical-align: middle;
+}
+
+.badge-estado {
+	padding: 8px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+}
+
+.hero {
+	background: linear-gradient(135deg, #0d6efd, #6610f2);
+	color: white;
+	border-radius: 20px;
+	padding: 40px;
+	margin-bottom: 30px;
+}
+
+.btn-custom {
+	border-radius: 10px;
+}
+
+.stat-card {
+	text-align: center;
+	padding: 20px;
+}
+
+.stat-number {
+	font-size: 30px;
+	font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-custom">
+		<div class="container">
+			<a class="navbar-brand" href="#"> ⚽ Mundial HUB </a>
+			<div class="d-flex">
+				<button class="btn btn-light btn-custom me-2"
+					onclick="cargarMisEntradas()">
+					<i class="fa fa-rotate-right"></i> Actualizar
+				</button>
+				<a href="/dashboard-pollas.html"
+					class="btn btn-success btn-custom me-2"> 🏆 Pollas </a> <a
+					href="/dashboard-album.html"
+					class="btn btn-primary btn-custom me-2"> 📔 Álbum Virtual </a> <a
+					href="/perfil.html" class="btn btn-info btn-custom me-2"><i
+					class="fa fa-user"></i> Mi Perfil</a> <a href="/logout"
+					class="btn btn-danger btn-custom"> <i
+					class="fa fa-right-from-bracket"></i> Cerrar sesión
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container mt-4">
+		<div class="hero">
+			<h1 class="mb-3">Bienvenido a Mundial HUB ⚽</h1>
+			<p class="mb-0">Reserva entradas para los partidos del mundial,
+				consulta tus reservas y administra tus compras.</p>
+		</div>
+
+		<div class="row mb-4">
+			<div class="col-md-4">
+				<div class="card stat-card">
+					<h5>🎟 Entradas</h5>
+					<div class="stat-number" id="totalEntradas">0</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card stat-card">
+					<h5>⚽ Partidos</h5>
+					<div class="stat-number" id="totalPartidos">0</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card stat-card">
+					<h5>✅ Reservadas</h5>
+					<div class="stat-number" id="totalReservadas">0</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card p-4 mb-5">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h3>⚽ Partidos Disponibles</h3>
+			</div>
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead class="table-dark">
+						<tr>
+							<th>ID</th>
+							<th>Local</th>
+							<th>Visitante</th>
+							<th>Fecha</th>
+							<th>Acción</th>
+						</tr>
+					</thead>
+					<tbody id="tablaPartidos">
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="card p-4">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h3>🎟 Mis Entradas</h3>
+			</div>
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead class="table-primary">
+						<tr>
+							<th>ID</th>
+							<th>Partido</th>
+							<th>Fecha</th>
+							<th>Estado</th>
+							<th>Acción</th>
+						</tr>
+					</thead>
+					<tbody id="tablaEntradas">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalPago" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header bg-dark text-white">
+					<h5 class="modal-title">
+						<i class="fa fa-lock"></i> Pago Seguro - Mundial HUB
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-4">
+					<div class="text-center mb-3">
+						<h4 id="franquiciaIcono" style="font-size: 2rem;">💳</h4>
+						<span id="franquiciaTexto" class="text-muted fw-bold">Ingresa
+							tu tarjeta</span>
+					</div>
+
+					<div class="mb-3">
+						<label class="form-label">Número de Tarjeta</label> <input
+							type="text" id="numeroTarjeta"
+							class="form-control form-control-lg text-center"
+							placeholder="0000 0000 0000 0000" maxlength="19"
+							onkeyup="detectarTarjeta()">
+					</div>
+
+					<div class="row">
+						<div class="col-6">
+							<label class="form-label">Vencimiento</label> <input type="text"
+								class="form-control text-center" placeholder="MM/YY"
+								maxlength="5">
+						</div>
+						<div class="col-6">
+							<label class="form-label">CVV</label> <input type="password"
+								class="form-control text-center" placeholder="***" maxlength="4">
+						</div>
+					</div>
+
+					<div class="mt-4 text-center d-none" id="loaderPago">
+						<div class="spinner-border text-primary" role="status"></div>
+						<p class="mt-2 text-primary fw-bold">Conectando con el
+							banco...</p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Cancelar</button>
+					<button type="button" class="btn btn-success w-50"
+						id="btnProcesarPago" onclick="simularPago()">Pagar Ahora</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+	// ==========================================
+	// TRANSFERENCIA DE ENTRADAS P2P
+	// ==========================================
+	async function transferirEntrada(entradaId) {
+	    let usernameDestino = prompt("Ingresa el @username del amigo al que le enviarás la entrada:");
+	    if (!usernameDestino) return;
+
+	    // Limpiar el texto por si el usuario escribe el "@"
+	    usernameDestino = usernameDestino.replace('@', '').trim();
+
+	    try {
+	        const response = await fetch(`/api/entradas/transferir/${entradaId}?usernameDestino=${usernameDestino}`, {
+	            method: "POST"
+	        });
+
+	        if (response.ok) {
+	            alert(`✅ ¡Transferencia exitosa! La entrada ya pertenece a @${usernameDestino}.`);
+	            cargarMisEntradas(); // Refrescar la tabla para que la entrada desaparezca
+	        } else {
+	            const errorText = await response.text();
+	            alert("❌ No se pudo transferir: " + errorText);
+	        }
+	    } catch (error) {
+	        alert("❌ Error de red al intentar transferir.");
+	    }
+	}
+	async function cargarPartidos(){
+	    const responsePartidos = await fetch("/api/partidos");
+	    const partidos = await responsePartidos.json();
+
+	    const responseEntradas = await fetch("/api/entradas/mis-entradas");
+	    const entradas = await responseEntradas.json();
+
+	    let idsBloqueados = entradas.filter(e => e.estado === 'RESERVADA' || e.estado === 'PAGADA').map(e => e.partido.id);
+
+	    let html = "";
+	    let disponibles = 0;
+
+	    partidos.forEach(p => {
+	        if(!idsBloqueados.includes(p.id) && p.estado !== 'FINALIZADO'){
+	            disponibles++;
+	            const ahora = new Date();
+	            const fechaPartido = new Date(p.fecha);
+	            
+	            let botonReserva = "";
+	            if (fechaPartido > ahora) {
+	                botonReserva = `<button class="btn btn-success" onclick="reservar(${p.id})">Reservar</button>`;
+	            } else {
+	                botonReserva = `<span class="badge bg-secondary">Partido Iniciado</span>`;
+	            }
+
+	            html += `
+	            <tr>
+	                <td>${p.id}</td>
+	                <td>${p.local}</td>
+	                <td>${p.visitante}</td>
+	                <td>${p.fecha.replace("T", " ")}</td>
+	                <td>${botonReserva}</td>
+	            </tr>
+	            `;
+	        }
+	    });
+
+	    document.getElementById("tablaPartidos").innerHTML = html;
+	    document.getElementById("totalPartidos").innerText = disponibles;
+	}
+
+	async function reservar(partidoId){
+	    try{
+	        const response = await fetch("/api/entradas/crear/" + partidoId, { method: "POST" });
+	        if(response.ok){
+	            alert("✅ Reserva realizada con éxito. ¡Tienes 5 minutos para pagarla!");
+	            cargarPartidos();
+	            cargarMisEntradas();
+	        }
+	        else{
+	            const errorMsg = await response.text();
+	            alert("❌ No se pudo reservar: " + errorMsg);
+	        }
+	    }catch(e){
+	        alert("❌ Error de red al intentar reservar.");
+	    }
+	}
+
+	async function cargarMisEntradas() {
+	    try {
+	        const response = await fetch("/api/entradas/mis-entradas");
+	        const entradas = await response.json();
+
+	        document.getElementById("totalEntradas").innerText = entradas.length;
+	        let reservadas = 0;
+	        let html = "";
+
+	        entradas.forEach(e => {
+	            let badge = "";
+	            let botonPago = "";
+
+	            if(e.estado === "RESERVADA"){
+	                reservadas++;
+	                badge = `<span class="badge bg-warning text-dark badge-estado">RESERVADA</span>`;
+	                botonPago = `<button class="btn btn-sm btn-success fw-bold" onclick="abrirModalPago(${e.id})"><i class="fa fa-credit-card"></i> Pagar</button>`;
+	            } else if(e.estado === "PAGADA"){
+	                badge = `<span class="badge bg-success badge-estado">PAGADA</span>`;
+	                // 🔥 Modificamos aquí: Agregamos el botón de transferencia
+	                botonPago = `
+	                    <span class="text-success fw-bold me-2"><i class="fa fa-check-circle"></i> Listo</span>
+	                    <button class="btn btn-sm btn-outline-primary" onclick="transferirEntrada(${e.id})">
+	                        <i class="fa fa-exchange-alt"></i> Transferir
+	                    </button>`;
+	            } else if(e.estado === "EXPIRADA"){
+	                badge = `<span class="badge bg-danger badge-estado">EXPIRADA</span>`;
+	                botonPago = `<span class="text-danger small">Tiempo Agotado</span>`;
+	            } else {
+	                badge = `<span class="badge bg-secondary badge-estado">${e.estado}</span>`;
+	            }
+
+	            let fechaStr = e.partido.fecha.replace("T", " ");
+
+	            html += `
+	                <tr>
+	                    <td>${e.id}</td>
+	                    <td><strong>${e.partido.local}</strong> vs <strong>${e.partido.visitante}</strong></td>
+	                    <td>${fechaStr}</td>
+	                    <td>${badge}</td>
+	                    <td>${botonPago}</td>
+	                </tr>
+	            `;
+	        });
+
+	        document.getElementById("tablaEntradas").innerHTML = html;
+	        document.getElementById("totalReservadas").innerText = reservadas;
+	        
+	    } catch (error) {
+	        console.error("Error al cargar entradas:", error);
+	    }
+	}
+
+	// ==========================================
+	// PASARELA DE PAGO SIMULADA
+	// ==========================================
+	let entradaPendienteDePago = null;
+	let modalPagoInstancia = null;
+
+	function abrirModalPago(entradaId) {
+	    entradaPendienteDePago = entradaId;
+	    document.getElementById('numeroTarjeta').value = '';
+	    document.getElementById('franquiciaIcono').innerHTML = '💳';
+	    document.getElementById('franquiciaTexto').innerText = 'Ingresa tu tarjeta';
+	    document.getElementById('loaderPago').classList.add('d-none');
+	    document.getElementById('btnProcesarPago').disabled = false;
+
+	    modalPagoInstancia = new bootstrap.Modal(document.getElementById('modalPago'));
+	    modalPagoInstancia.show();
+	}
+
+	function detectarTarjeta() {
+	    let input = document.getElementById('numeroTarjeta');
+	    let valor = input.value.replace(/\s+/g, '');
+	    let icono = document.getElementById('franquiciaIcono');
+	    let texto = document.getElementById('franquiciaTexto');
+
+	    if (valor.length > 0) {
+	        valor = valor.match(new RegExp('.{1,4}', 'g')).join(' ');
+	    }
+	    input.value = valor;
+
+	    let primerNumero = valor.charAt(0);
+	    
+	    if (primerNumero === '4') {
+	        icono.innerHTML = '<i class="fa-brands fa-cc-visa text-primary"></i>';
+	        texto.innerText = 'VISA';
+	        texto.className = 'text-primary fw-bold';
+	    } else if (primerNumero === '5') {
+	        icono.innerHTML = '<i class="fa-brands fa-cc-mastercard text-warning"></i>';
+	        texto.innerText = 'MasterCard';
+	        texto.className = 'text-warning text-dark fw-bold';
+	    } else if (primerNumero === '3') {
+	        icono.innerHTML = '<i class="fa-brands fa-cc-amex text-info"></i>';
+	        texto.innerText = 'American Express';
+	        texto.className = 'text-info text-dark fw-bold';
+	    } else if (valor.length > 0) {
+	        icono.innerHTML = '💳';
+	        texto.innerText = 'Tarjeta Genérica';
+	        texto.className = 'text-muted fw-bold';
+	    } else {
+	        icono.innerHTML = '💳';
+	        texto.innerText = 'Ingresa tu tarjeta';
+	        texto.className = 'text-muted fw-bold';
+	    }
+	}
+
+	function simularPago() {
+	    let inputTarjeta = document.getElementById('numeroTarjeta').value;
+	    if (inputTarjeta.length < 15) {
+	        alert("Por favor ingresa un número de tarjeta válido.");
+	        return;
+	    }
+
+	    document.getElementById('btnProcesarPago').disabled = true;
+	    document.getElementById('loaderPago').classList.remove('d-none');
+
+	    setTimeout(async () => {
+	        try {
+	            const response = await fetch("/api/entradas/pagar/" + entradaPendienteDePago, {
+	                method: "POST"
+	            });
+
+	            if(response.ok) {
+	                alert("✅ ¡Transacción Aprobada! Tu entrada está confirmada.");
+	                modalPagoInstancia.hide();
+	                cargarPartidos();
+	                cargarMisEntradas(); 
+	            } else {
+	                const errorText = await response.text();
+	                alert("❌ El banco rechazó la transacción: " + errorText);
+	            }
+	        } catch (error) {
+	            alert("❌ Error de red al conectarse con el banco.");
+	        } finally {
+	            document.getElementById('btnProcesarPago').disabled = false;
+	            document.getElementById('loaderPago').classList.add('d-none');
+	        }
+	    }, 2500); // 2.5 segundos de simulación para darle realismo
+	}
+
+	cargarPartidos();
+	cargarMisEntradas();
+	</script>
+
+</body>
+</html>

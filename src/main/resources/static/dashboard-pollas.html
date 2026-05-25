@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mis Pollas - Mundial HUB</title>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+body {
+	background: #f4f7fc;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar-custom {
+	background: linear-gradient(90deg, #0d6efd, #6610f2);
+}
+
+.navbar-brand {
+	font-weight: bold;
+	color: white !important;
+}
+
+.hero {
+	background: linear-gradient(135deg, #0d6efd, #6610f2);
+	color: white;
+	border-radius: 20px;
+	padding: 40px;
+	margin-bottom: 30px;
+}
+
+.card {
+	border: none;
+	border-radius: 18px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.btn-custom {
+	border-radius: 10px;
+}
+
+.polla-card {
+	background: white;
+	border-left: 5px solid #6610f2;
+	transition: transform 0.2s;
+}
+
+.polla-card:hover {
+	transform: scale(1.02);
+}
+
+.codigo-box {
+	background: #e9ecef;
+	padding: 5px 10px;
+	border-radius: 8px;
+	font-family: monospace;
+	font-weight: bold;
+	letter-spacing: 2px;
+}
+
+.input-goles {
+	width: 60px;
+	text-align: center;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-custom">
+		<div class="container">
+			<a class="navbar-brand" href="/dashboard-usuario.html"> <i
+				class="fa fa-arrow-left"></i> Volver al Inicio
+			</a>
+			<div class="d-flex">
+				<a href="/logout" class="btn btn-danger btn-custom"> <i
+					class="fa fa-right-from-bracket"></i> Cerrar sesión
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container mt-4">
+
+		<div class="hero text-center">
+			<h1 class="mb-3">🏆 Pollas Futboleras</h1>
+			<p class="mb-0">Crea grupos con tus amigos, pronostica los
+				resultados y compite por ser el mejor.</p>
+		</div>
+
+		<div class="row mb-5">
+			<div class="col-md-6">
+				<div class="card p-4 h-100">
+					<h4 class="mb-3">
+						<i class="fa fa-plus-circle text-primary"></i> Crear una Polla
+					</h4>
+					<div class="input-group">
+						<input type="text" id="nombrePolla" class="form-control"
+							placeholder="Ej. Los Amigos del Barrio">
+						<button class="btn btn-primary" onclick="crearPolla()">Crear</button>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 mt-3 mt-md-0">
+				<div class="card p-4 h-100">
+					<h4 class="mb-3">
+						<i class="fa fa-users text-success"></i> Unirse con Código
+					</h4>
+					<div class="input-group">
+						<input type="text" id="codigoPolla"
+							class="form-control text-uppercase"
+							placeholder="Código de 6 letras">
+						<button class="btn btn-success" onclick="unirsePolla()">Unirse</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<h3 class="mb-3">Mis Grupos (Pollas)</h3>
+		<div class="row mb-4" id="contenedorPollas"></div>
+
+		<div id="seccionPronosticos" class="card p-4 mt-4"
+			style="display: none;">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<h3 id="tituloPronosticos">Detalle del Grupo</h3>
+				<button class="btn btn-outline-secondary"
+					onclick="cerrarPronosticos()">
+					<i class="fa fa-times"></i> Cerrar
+				</button>
+			</div>
+
+			<div class="row">
+				<div class="col-lg-7 mb-4">
+					<h5 class="mb-3 text-primary">
+						<i class="fa fa-edit"></i> Ingresar Mis Pronósticos
+					</h5>
+					<div class="table-responsive">
+						<table
+							class="table table-hover align-middle text-center table-bordered">
+							<thead class="table-dark">
+								<tr>
+									<th>Partido</th>
+									<th>Pronóstico</th>
+									<th>Acción</th>
+								</tr>
+							</thead>
+							<tbody id="tablaPartidos"></tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="col-lg-5">
+					<h5 class="mb-3 text-success">
+						<i class="fa fa-trophy"></i> Tabla de Posiciones (Ranking)
+					</h5>
+					<div class="table-responsive">
+						<table
+							class="table table-striped align-middle text-center table-bordered">
+							<thead class="table-success">
+								<tr>
+									<th>Pos</th>
+									<th>Participante</th>
+									<th>Puntos</th>
+								</tr>
+							</thead>
+							<tbody id="tablaRanking">
+								<tr>
+									<td colspan="3" class="text-muted">Cargando ranking...</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+        var pollaActivaId = null;
+
+        function cargarPollas() {
+            fetch("/api/pollas/mis-pollas")
+                .then(function(res){ return res.json(); })
+                .then(function(pollas) {
+                    var html = "";
+                    if (pollas.length === 0) {
+                        html = `<div class="col-12"><p class="text-muted">Aún no perteneces a ninguna polla.</p></div>`;
+                    } else {
+                        pollas.forEach(function(p) {
+                            html += `
+                                <div class="col-md-4 mb-3">
+                                    <div class="card p-3 polla-card shadow-sm">
+                                        <h5>${p.nombre}</h5>
+                                        <p class="mb-2 text-muted small">Código: <span class="codigo-box">${p.codigoInvitacion}</span></p>
+                                        <p class="mb-3 small"><i class="fa fa-users"></i> ${p.participantes.length} Amigos</p>
+                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirDetallesGrupo(${p.id}, '${p.nombre}')">
+                                            Ver Grupo y Ranking
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    document.getElementById("contenedorPollas").innerHTML = html;
+                });
+        }
+
+        function crearPolla() {
+            var nombre = document.getElementById("nombrePolla").value;
+            if (!nombre) return alert("Ingresa un nombre");
+
+            fetch("/api/pollas/crear?nombre=" + encodeURIComponent(nombre), { method: "POST" })
+                .then(function(res) {
+                    if (res.ok) {
+                        alert("¡Polla creada!");
+                        document.getElementById("nombrePolla").value = "";
+                        cargarPollas();
+                    }
+                });
+        }
+
+        function unirsePolla() {
+            var codigo = document.getElementById("codigoPolla").value;
+            if (!codigo) return alert("Ingresa el código");
+
+            fetch("/api/pollas/unirse?codigo=" + encodeURIComponent(codigo), { method: "POST" })
+                .then(function(res) {
+                    if (res.ok) {
+                        alert("¡Te has unido!");
+                        document.getElementById("codigoPolla").value = "";
+                        cargarPollas();
+                    } else {
+                        alert("Código incorrecto");
+                    }
+                });
+        }
+
+        function abrirDetallesGrupo(idPolla, nombrePolla) {
+            pollaActivaId = idPolla;
+            document.getElementById("tituloPronosticos").innerText = "Grupo: " + nombrePolla;
+            document.getElementById("seccionPronosticos").style.display = "block";
+            document.getElementById("seccionPronosticos").scrollIntoView({ behavior: "smooth" });
+
+            cargarPartidosDisponibles();
+            cargarRankingGrupo(idPolla);
+        }
+
+        function cargarPartidosDisponibles() {
+            fetch("/api/partidos")
+                .then(function(res){ return res.json(); })
+                .then(function(partidos) {
+                    var html = "";
+                    partidos.forEach(function(p) {
+                        var infoResultado = p.estado === 'FINALIZADO' ? `<br><span class="badge bg-secondary">Resultado: ${p.golesLocal}-${p.golesVisitante}</span>` : "";
+                        
+                        html += `
+                            <tr>
+                                <td>
+                                    <span class="fw-bold">${p.local} vs ${p.visitante}</span>
+                                    ${infoResultado}
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <input type="number" min="0" class="form-control input-goles" id="golesL_${p.id}" value="0">
+                                        <span>-</span>
+                                        <input type="number" min="0" class="form-control input-goles" id="golesV_${p.id}" value="0">
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="guardarPronostico(${p.id})">
+                                        <i class="fa fa-save"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    document.getElementById("tablaPartidos").innerHTML = html;
+                });
+        }
+
+        // 🔥 NUEVA FUNCIÓN: TRAE LOS PUNTOS Y LOS USUARIOS DEL GRUPO EN ORDEN
+        function cargarRankingGrupo(idPolla) {
+            fetch("/api/pollas/" + idPolla + "/ranking")
+                .then(function(res) { return res.json(); })
+                .then(function(ranking) {
+                    var html = "";
+                    if(ranking.length === 0) {
+                        html = "<tr><td colspan='3' class='text-muted'>No hay participantes</td></tr>";
+                    } else {
+                        ranking.forEach(function(r, index) {
+                            var medalla = "";
+                            if(index === 0) medalla = "🥇 ";
+                            if(index === 1) medalla = "🥈 ";
+                            if(index === 2) medalla = "🥉 ";
+
+                            html += `
+                                <tr>
+                                    <td><b>${index + 1}</b></td>
+                                    <td class="text-start">${medalla}${r.nombre} <small class="text-muted">(@${r.username})</small></td>
+                                    <td><span class="badge bg-primary fs-6">${r.puntosTotales} pts</span></td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    document.getElementById("tablaRanking").innerHTML = html;
+                });
+        }
+
+        function guardarPronostico(partidoId) {
+            var golesL = document.getElementById(`golesL_${partidoId}`).value;
+            var golesV = document.getElementById(`golesV_${partidoId}`).value;
+
+            if (golesL === "" || golesV === "") return alert("Ingresa ambos marcadores");
+
+            fetch(`/api/pollas/pronosticar?pollaId=${pollaActivaId}&partidoId=${partidoId}&golesLocal=${golesL}&golesVisitante=${golesV}`, { method: "POST" })
+                .then(function(res) {
+                    if (res.ok) {
+                        alert("¡Pronóstico guardado!");
+                    }
+                });
+        }
+
+        function cerrarPronosticos() {
+            document.getElementById("seccionPronosticos").style.display = "none";
+            pollaActivaId = null;
+        }
+
+        cargarPollas();
+    </script>
+</body>
+</html>

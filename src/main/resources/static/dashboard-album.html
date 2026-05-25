@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Álbum Real - Mundial HUB</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+body {
+	background: #f4f6f9;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+	border: none;
+	border-radius: 15px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.lamina {
+	border-radius: 15px;
+	overflow: hidden;
+	background: white;
+	transition: 0.3s;
+	height: 100%;
+	border: 1px solid #eee;
+}
+
+.lamina:hover {
+	transform: scale(1.03);
+}
+
+.lamina img {
+	width: 100%;
+	height: 180px;
+	object-fit: cover;
+}
+
+.moneda-box {
+	background: #ffc107;
+	color: #000;
+	padding: 10px 20px;
+	border-radius: 20px;
+	font-weight: bold;
+	font-size: 1.2rem;
+}
+</style>
+</head>
+
+<body>
+
+	<div class="container mt-5">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h1>🏆 Álbum Coleccionable PRO</h1>
+			<div class="d-flex align-items-center gap-3">
+				<a href="/dashboard-usuario.html" class="btn btn-outline-primary"><i
+					class="fa fa-arrow-left"></i> Volver</a>
+				<button class="btn btn-success fw-bold shadow-sm"
+					onclick="simularRecarga()">
+					<i class="fa fa-credit-card"></i> Recargar
+				</button>
+				<span class="moneda-box shadow-sm"><i class="fa fa-coins"></i>
+					Monedas: <span id="saldoMonedas">0</span></span>
+			</div>
+		</div>
+
+		<div class="row mb-4">
+			<div class="col-md-6 mb-3">
+				<div class="card p-4 h-100 bg-primary text-white text-center shadow">
+					<h4>Comprar Sobre (5 Monedas)</h4>
+					<p class="small">Recibe 3 láminas. Las repetidas van a tu
+						inventario de ventas.</p>
+					<button class="btn btn-light btn-lg fw-bold text-primary"
+						onclick="abrirSobre()">
+						<i class="fa fa-box-open"></i> Abrir Sobre
+					</button>
+				</div>
+			</div>
+			<div class="col-md-6 mb-3">
+				<div class="card p-4 h-100 shadow">
+					<h4>Progreso del Álbum</h4>
+					<div class="progress my-3" style="height: 30px;">
+						<div id="barra"
+							class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+							style="width: 0%;">0%</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<ul class="nav nav-tabs mb-4" id="albumTabs">
+			<li class="nav-item"><button class="nav-link active fw-bold"
+					data-bs-toggle="tab" data-bs-target="#mis-laminas"
+					onclick="cargarMisLaminas()">Mis Álbum</button></li>
+			<li class="nav-item"><button class="nav-link fw-bold"
+					data-bs-toggle="tab" data-bs-target="#mercado-sistema"
+					onclick="cargarMercadoSistema()">Tienda Sistema</button></li>
+			<li class="nav-item"><button class="nav-link fw-bold"
+					data-bs-toggle="tab" data-bs-target="#mercado-p2p"
+					onclick="cargarMercadoP2P()">Mercado Comunidad</button></li>
+			<li class="nav-item"><button class="nav-link fw-bold"
+					data-bs-toggle="tab" data-bs-target="#mis-repetidas"
+					onclick="cargarMisRepetidas()">Mis Repetidas</button></li>
+		</ul>
+
+		<div class="tab-content">
+			<div class="tab-pane fade show active" id="mis-laminas">
+				<div class="row" id="contenedorMisLaminas"></div>
+			</div>
+
+			<div class="tab-pane fade" id="mercado-sistema">
+				<div class="alert alert-warning">Precios oficiales: ¡Las
+					Superestrellas mundiales valen más!</div>
+				<div class="row" id="contenedorSistema"></div>
+			</div>
+
+			<div class="tab-pane fade" id="mercado-p2p">
+				<div class="alert alert-success">Compra láminas directamente a
+					otros usuarios conectados.</div>
+				<div class="row" id="contenedorP2P"></div>
+			</div>
+
+			<div class="tab-pane fade" id="mis-repetidas">
+				<div class="alert alert-secondary">Ponles precio a tus
+					repetidas y ofrécelas al mercado.</div>
+				<div class="row" id="contenedorRepetidas"></div>
+			</div>
+		</div>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+    let misLaminasIds = [];
+
+    function inicializar() {
+        cargarMonedas();
+        cargarMisLaminas();
+    }
+
+    function cargarMonedas() {
+        fetch("/api/album/mis-monedas").then(res => res.text()).then(m => document.getElementById("saldoMonedas").innerText = m);
+    }
+
+    function cargarMisLaminas() {
+        fetch("/api/album/mis-laminas").then(res => res.json()).then(laminas => {
+            misLaminasIds = laminas.map(l => l.id);
+            let html = laminas.length === 0 ? "<p class='text-muted p-3'>Álbum vacío.</p>" : "";
+            laminas.forEach(l => {
+                html += `<div class='col-md-3 mb-4'><div class='lamina shadow-sm'><img src='${l.imagenUrl}'><div class='p-3 text-center'><h6>${l.nombreJugador}</h6><span class='badge bg-primary'>${l.seleccion}</span></div></div></div>`;
+            });
+            document.getElementById("contenedorMisLaminas").innerHTML = html;
+            actualizarBarra(laminas.length);
+        });
+    }
+
+    function cargarMercadoSistema() {
+        fetch("/api/album/todas-laminas").then(res => res.json()).then(todas => {
+            let html = "";
+            const faltantes = todas.filter(l => !misLaminasIds.includes(l.id));
+            faltantes.forEach(l => {
+                html += `<div class='col-md-3 mb-4'><div class='lamina text-center shadow-sm'><img src='${l.imagenUrl}' style='filter:grayscale(100%);'><div class='p-3'><h6>${l.nombreJugador}</h6><p class='small text-muted'>${l.seleccion}</p><button class='btn btn-warning btn-sm fw-bold w-100' onclick='comprarSistema(${l.id})'><i class='fa fa-coins'></i> Comprar (${l.valorMercado})</button></div></div></div>`;
+            });
+            document.getElementById("contenedorSistema").innerHTML = html || "<p class='p-3'>¡Completaste el álbum!</p>";
+        });
+    }
+
+    function cargarMercadoP2P() {
+        fetch("/api/album/comunidad").then(res => res.json()).then(ofertas => {
+            let html = "";
+            ofertas.forEach(o => {
+                html += `<div class='col-md-3 mb-4'><div class='lamina text-center shadow-sm'><img src='${o.lamina.imagenUrl}'><div class='p-3'><h6>${o.lamina.nombreJugador}</h6><p class='small text-muted'>Vendedor: @${o.vendedor.username}</p><button class='btn btn-success btn-sm fw-bold w-100' onclick='comprarP2P(${o.id})'><i class='fa fa-shopping-cart'></i> Comprar por ${o.precio}</button></div></div></div>`;
+            });
+            document.getElementById("contenedorP2P").innerHTML = html || "<p class='p-3 text-muted'>No hay ofertas de la comunidad en este momento.</p>";
+        });
+    }
+
+    function cargarMisRepetidas() {
+        fetch("/api/album/mis-repetidas").then(res => res.json()).then(reps => {
+            let html = "";
+            reps.forEach(l => {
+                html += `<div class='col-md-3 mb-4'><div class='lamina text-center shadow-sm'><img src='${l.imagenUrl}'><div class='p-3'><h6>${l.nombreJugador}</h6><button class='btn btn-danger btn-sm w-100 mt-2' onclick='publicar(${l.id})'><i class='fa fa-tags'></i> Vender en Comunidad</button></div></div></div>`;
+            });
+            document.getElementById("contenedorRepetidas").innerHTML = html || "<p class='p-3 text-muted'>No tienes láminas repetidas actualmente.</p>";
+        });
+    }
+
+    function actualizarBarra(total) {
+        fetch("/api/album/todas-laminas").then(res => res.json()).then(t => {
+            if(t.length === 0) return;
+            let p = (total / t.length) * 100;
+            document.getElementById("barra").style.width = p + "%";
+            document.getElementById("barra").innerText = Math.floor(p) + "%";
+        });
+    }
+
+    function abrirSobre() {
+        fetch("/api/album/abrir-sobre", {method:"POST"}).then(res => res.ok ? inicializar() : res.text().then(e => alert(e)));
+    }
+
+    function comprarSistema(id) {
+        fetch("/api/album/comprar-sistema?laminaId=" + id, {method:"POST"}).then(res => res.ok ? (alert("¡Comprada al sistema!"), inicializar(), cargarMercadoSistema()) : res.text().then(e => alert(e)));
+    }
+
+    function comprarP2P(id) {
+        fetch("/api/album/comprar-p2p?ofertaId=" + id, {method:"POST"}).then(res => res.ok ? (alert("¡Compra P2P Exitosa!"), inicializar(), cargarMercadoP2P()) : res.text().then(e => alert(e)));
+    }
+
+    function publicar(id) {
+        let precio = prompt("¿A qué precio deseas vender esta lámina en la comunidad?");
+        if(!precio) return;
+        fetch(`/api/album/publicar?laminaId=${id}&precio=${precio}`, {method:"POST"}).then(res => res.ok ? (alert("¡Lámina puesta a la venta!"), cargarMisRepetidas()) : alert("Error"));
+    }
+
+    function simularRecarga() {
+        fetch("/api/album/recargar?cantidad=20", {method:"POST"}).then(res => { inicializar(); });
+    }
+
+    inicializar();
+</script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Admin - Mundial HUB</title>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+	rel="stylesheet">
+
+<style>
+body {
+	background: #f4f6f9;
+}
+
+.sidebar {
+	width: 250px;
+	height: 100vh;
+	position: fixed;
+	background: #212529;
+	color: white;
+	padding: 20px;
+}
+
+.content {
+	margin-left: 260px;
+	padding: 30px;
+}
+
+.card {
+	border: none;
+	border-radius: 15px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+	text-align: left;
+	transition: 0.3s;
+}
+
+.nav-btn.active {
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	color: white;
+}
+
+.seccion {
+	display: none;
+}
+
+.seccion.activa {
+	display: block;
+}
+</style>
+</head>
+<body>
+
+	<div class="sidebar">
+		<h3>⚽ Mundial HUB</h3>
+		<hr>
+		<p>
+			<i class="bi bi-shield-lock"></i> Panel de Administrador
+		</p>
+
+		<button id="btn-partidos"
+			class="btn btn-outline-light w-100 mb-2 nav-btn active"
+			onclick="cambiarSeccion('partidos')">
+			<i class="bi bi-calendar-event"></i> Gestión de Partidos
+		</button>
+
+		<button id="btn-usuarios"
+			class="btn btn-outline-light w-100 mb-2 nav-btn"
+			onclick="cambiarSeccion('usuarios')">
+			<i class="bi bi-people"></i> Usuarios Registrados
+		</button>
+
+		<a href="/logout" class="btn btn-danger w-100 mt-4"> <i
+			class="bi bi-box-arrow-right"></i> Cerrar sesión
+		</a>
+	</div>
+
+	<div class="content">
+
+		<div id="seccion-partidos" class="seccion activa">
+			<div class="d-flex justify-content-between align-items-center mb-4">
+				<h2>Gestión de Partidos</h2>
+				<div>
+					<button class="btn btn-success fw-bold shadow-sm me-2"
+						onclick="sincronizarAPI(false)">
+						<i class="bi bi-cloud-download"></i> API Real (Éxito)
+					</button>
+					<button class="btn btn-danger fw-bold shadow-sm"
+						onclick="sincronizarAPI(true)">
+						<i class="bi bi-exclamation-triangle"></i> Simular Caída API
+					</button>
+				</div>
+			</div>
+			<div class="card p-4 mb-4">
+				<h5 class="mb-3">
+					<i class="bi bi-plus-circle"></i> Crear Nuevo Partido
+				</h5>
+				<div class="row">
+					<div class="col-md-4 mb-2">
+						<select id="local" class="form-select">
+							<option value="" disabled selected>Equipo Local...</option>
+							<option value="Argentina">Argentina</option>
+							<option value="Brasil">Brasil</option>
+							<option value="Colombia">Colombia</option>
+							<option value="España">España</option>
+							<option value="Francia">Francia</option>
+							<option value="Inglaterra">Inglaterra</option>
+							<option value="Alemania">Alemania</option>
+							<option value="Italia">Italia</option>
+							<option value="Uruguay">Uruguay</option>
+						</select>
+					</div>
+					<div class="col-md-4 mb-2">
+						<select id="visitante" class="form-select">
+							<option value="" disabled selected>Equipo Visitante...</option>
+							<option value="Argentina">Argentina</option>
+							<option value="Brasil">Brasil</option>
+							<option value="Colombia">Colombia</option>
+							<option value="España">España</option>
+							<option value="Francia">Francia</option>
+							<option value="Inglaterra">Inglaterra</option>
+							<option value="Alemania">Alemania</option>
+							<option value="Italia">Italia</option>
+							<option value="Uruguay">Uruguay</option>
+						</select>
+					</div>
+					<div class="col-md-3 mb-2">
+						<input type="datetime-local" id="fecha" class="form-control">
+					</div>
+					<div class="col-md-1 mb-2">
+						<button class="btn btn-primary w-100" onclick="crearPartido()">Guardar</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="card p-4">
+				<h5 class="mb-3">
+					<i class="bi bi-list-ul"></i> Partidos Registrados
+				</h5>
+				<div class="table-responsive">
+					<table class="table table-hover align-middle">
+						<thead class="table-dark">
+							<tr>
+								<th>ID</th>
+								<th>Local</th>
+								<th>Visitante</th>
+								<th>Fecha y Hora</th>
+								<th>Estado / Acción</th>
+							</tr>
+						</thead>
+						<tbody id="tablaPartidos">
+							<tr>
+								<td colspan="5" class="text-center">Cargando partidos...</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div id="seccion-usuarios" class="seccion">
+			<h2 class="mb-4">Usuarios Registrados</h2>
+			<div class="card p-4">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h5>
+						<i class="bi bi-person-lines-fill"></i> Directorio de Usuarios
+					</h5>
+					<button class="btn btn-outline-secondary btn-sm"
+						onclick="cargarUsuarios()">
+						<i class="bi bi-arrow-clockwise"></i> Refrescar
+					</button>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-hover align-middle">
+						<thead class="table-primary">
+							<tr>
+								<th>ID</th>
+								<th>Nombre Completo</th>
+								<th>Username</th>
+								<th>Correo Electrónico</th>
+								<th>Rol</th>
+							</tr>
+						</thead>
+						<tbody id="tablaUsuarios">
+							<tr>
+								<td colspan="5" class="text-center">Cargando usuarios...</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+	// ==========================================
+    // CONSUMO DE API EXTERNA
+    // ==========================================
+    function sincronizarAPI(forzarFalla) {
+    let mensaje = forzarFalla 
+        ? "¿Deseas SIMULAR UNA CAÍDA de la API para probar la Resiliencia?" 
+        : "¿Deseas conectar con Mocky para descargar los partidos reales?";
+        
+    if(!confirm(mensaje)) return;
+
+    fetch("/api/partidos/sincronizar?forzarFalla=" + forzarFalla, { method: "POST" })
+    .then(function(res) {
+        if(res.ok) {
+            if(forzarFalla) {
+                alert("⚠️ Simulación de caída activada. Revise la Auditoría del Operador.");
+            } else {
+                alert("✅ Datos sincronizados correctamente desde el proveedor externo.");
+            }
+            cargarPartidos(); 
+        }
+    });
+}
+	// ==========================================
+    // INICIALIZACIÓN Y LÓGICA DE SELECTS
+    // ==========================================
+    window.onload = function() {
+        // 1. Bloqueo de fechas pasadas
+        const inputFecha = document.getElementById('fecha');
+        const ahora = new Date();
+        ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+        inputFecha.min = ahora.toISOString().slice(0,16);
+
+        // 2. Lógica para evitar equipos duplicados
+        const selectLocal = document.getElementById('local');
+        const selectVisitante = document.getElementById('visitante');
+
+        function actualizarListas() {
+            const valorLocal = selectLocal.value;
+            const valorVisitante = selectVisitante.value;
+
+            // Primero reactivamos todas las opciones en ambos selects
+            Array.from(selectLocal.options).forEach(opt => opt.disabled = false);
+            Array.from(selectVisitante.options).forEach(opt => opt.disabled = false);
+
+            // Volvemos a bloquear el "Seleccione..." por defecto
+            selectLocal.options[0].disabled = true;
+            selectVisitante.options[0].disabled = true;
+
+            // Si hay un local seleccionado, lo bloqueamos en el visitante
+            if (valorLocal) {
+                const optEnVisitante = Array.from(selectVisitante.options).find(o => o.value === valorLocal);
+                if (optEnVisitante) optEnVisitante.disabled = true;
+            }
+
+            // Si hay un visitante seleccionado, lo bloqueamos en el local
+            if (valorVisitante) {
+                const optEnLocal = Array.from(selectLocal.options).find(o => o.value === valorVisitante);
+                if (optEnLocal) optEnLocal.disabled = true;
+            }
+        }
+
+        // Asignamos el evento de cambio a ambos selects
+        selectLocal.addEventListener('change', actualizarListas);
+        selectVisitante.addEventListener('change', actualizarListas);
+    };
+
+    function cambiarSeccion(seccion) {
+        document.getElementById("seccion-partidos").classList.remove("activa");
+        document.getElementById("seccion-usuarios").classList.remove("activa");
+        document.getElementById("btn-partidos").classList.remove("active");
+        document.getElementById("btn-usuarios").classList.remove("active");
+
+        if(seccion === 'partidos') {
+            document.getElementById("seccion-partidos").classList.add("activa");
+            document.getElementById("btn-partidos").classList.add("active");
+            cargarPartidos();
+        } else if(seccion === 'usuarios') {
+            document.getElementById("seccion-usuarios").classList.add("activa");
+            document.getElementById("btn-usuarios").classList.add("active");
+            cargarUsuarios();
+        }
+    }
+
+    function cargarPartidos() {
+        fetch("/api/partidos")
+            .then(function(res) { return res.json(); })
+            .then(function(partidos) {
+                var html = "";
+                if(partidos.length === 0) {
+                    html = "<tr><td colspan='5' class='text-center text-muted'>No hay partidos registrados</td></tr>";
+                } else {
+                    partidos.forEach(function(p) {
+                        var fechaLimpia = p.fecha ? p.fecha.replace("T", " ") : "Sin fecha";
+                        var estadoHtml = p.estado === 'FINALIZADO' 
+                            ? "<span class='badge bg-success'>" + p.golesLocal + " - " + p.golesVisitante + "</span>" 
+                            : "<button class='btn btn-warning btn-sm' onclick='finalizar(" + p.id + ", \"" + p.local + "\", \"" + p.visitante + "\")'>Finalizar</button>";
+                        
+                        html += "<tr>";
+                        html += "<td><b>#" + p.id + "</b></td>";
+                        html += "<td>" + p.local + "</td>";
+                        html += "<td>" + p.visitante + "</td>";
+                        html += "<td>" + fechaLimpia + "</td>";
+                        html += "<td>" + estadoHtml + "</td>";
+                        html += "</tr>";
+                    });
+                }
+                document.getElementById("tablaPartidos").innerHTML = html;
+            })
+            .catch(function(err) { console.error(err); });
+    }
+
+    function finalizar(id, local, visitante) {
+        var golesL = prompt("Ingresa los goles reales de " + local + ":");
+        if (golesL === null || golesL === "") return;
+        
+        var golesV = prompt("Ingresa los goles reales de " + visitante + ":");
+        if (golesV === null || golesV === "") return;
+
+        fetch("/api/partidos/finalizar/" + id + "?golesLocal=" + golesL + "&golesVisitante=" + golesV, {
+            method: "POST"
+        })
+        .then(function(res) {
+            if (res.ok) {
+                alert("✅ Partido finalizado. Se han calculado los puntos de las pollas.");
+                cargarPartidos();
+            } else {
+                alert("❌ Error al finalizar el partido.");
+            }
+        });
+    }
+
+    function crearPartido() {
+        var local = document.getElementById("local").value;
+        var visitante = document.getElementById("visitante").value;
+        var fecha = document.getElementById("fecha").value;
+
+        if(!local || !visitante || !fecha) {
+            alert("Por favor completa todos los campos del partido.");
+            return;
+        }
+
+        if(local === visitante) {
+            alert("Un equipo no puede jugar contra sí mismo.");
+            return;
+        }
+
+        fetch("/api/partidos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ local: local, visitante: visitante, fecha: fecha })
+        })
+        .then(function(res) {
+            if(res.ok) {
+                alert("✅ Partido registrado exitosamente");
+                document.getElementById("local").value = "";
+                document.getElementById("visitante").value = "";
+                document.getElementById("fecha").value = "";
+                cargarPartidos(); 
+            } else {
+                alert("❌ Hubo un error al crear el partido.");
+            }
+        })
+        .catch(function(err) { console.error(err); });
+    }
+
+    function cargarUsuarios() {
+        fetch("/api/usuarios")
+            .then(function(res) { return res.json(); })
+            .then(function(usuarios) {
+                var html = "";
+                usuarios.forEach(function(u) {
+                    var badgeClass = u.rol === 'ADMIN' ? 'bg-danger' : (u.rol === 'OPERADOR' ? 'bg-warning text-dark' : 'bg-primary');
+                    html += "<tr>";
+                    html += "<td>#" + u.id + "</td>";
+                    html += "<td>" + (u.nombre || 'N/A') + "</td>";
+                    html += "<td><b>@" + u.username + "</b></td>";
+                    html += "<td>" + (u.email || 'N/A') + "</td>";
+                    html += "<td><span class='badge " + badgeClass + "'>" + u.rol + "</span></td>";
+                    html += "</tr>";
+                });
+                document.getElementById("tablaUsuarios").innerHTML = html;
+            })
+            .catch(function(err) { console.error(err); });
+    }
+
+    cargarPartidos();
+</script>
+
+</body>
+</html>
