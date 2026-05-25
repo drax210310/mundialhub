@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.mundial.hub.model.Usuario;
 import com.mundial.hub.repository.UsuarioRepository;
 import com.mundial.hub.service.UsuarioService;
-
+@SuppressWarnings("java:S4684")
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {

@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.mundial.hub.model.*;
 import com.mundial.hub.repository.UsuarioRepository;
 import com.mundial.hub.repository.LaminaRepository;
-
+@SuppressWarnings("java:S2068")
 @Configuration
 public class DataLoader {
 

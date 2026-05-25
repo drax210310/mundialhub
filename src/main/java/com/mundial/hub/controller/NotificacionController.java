@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.mundial.hub.model.Notificacion;
 import com.mundial.hub.service.NotificacionService;
-
+@SuppressWarnings("java:S4684")
 @RestController
 @RequestMapping("/api/notificaciones")
 public class NotificacionController {

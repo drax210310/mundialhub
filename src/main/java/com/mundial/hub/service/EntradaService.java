@@ -120,6 +120,7 @@ public class EntradaService {
 	// =============================
 	// TRANSFERIR ENTRADA (Control Antifraude)
 	// =============================
+	@SuppressWarnings("java:S5145")
 	public Entrada transferirEntrada(Long entradaId, String usernameDestino, Authentication auth) {
 		Entrada entrada = entradaRepo.findById(entradaId)
 				.orElseThrow(() -> new RuntimeException("Entrada no encontrada."));

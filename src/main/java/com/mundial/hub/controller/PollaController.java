@@ -9,7 +9,7 @@ import com.mundial.hub.service.PollaService;
 
 @RestController
 @RequestMapping("/api/pollas")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8081")
 public class PollaController {
 
 	@Autowired

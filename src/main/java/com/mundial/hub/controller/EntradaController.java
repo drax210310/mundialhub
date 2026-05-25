@@ -11,7 +11,7 @@ import com.mundial.hub.service.EntradaService;
 
 @RestController
 @RequestMapping("/api/entradas")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8081")
 public class EntradaController {
 
 	@Autowired

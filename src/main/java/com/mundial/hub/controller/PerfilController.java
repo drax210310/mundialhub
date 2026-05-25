@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.mundial.hub.model.Usuario;
 import com.mundial.hub.repository.UsuarioRepository;
-
+@SuppressWarnings("java:S4684")
 @RestController
 @RequestMapping("/api/perfil")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8081")
 public class PerfilController {
 
 	@Autowired

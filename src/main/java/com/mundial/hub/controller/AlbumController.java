@@ -12,7 +12,7 @@ import com.mundial.hub.service.AlbumService;
 
 @RestController
 @RequestMapping("/api/album")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:8081")
 public class AlbumController {
 
     @Autowired
