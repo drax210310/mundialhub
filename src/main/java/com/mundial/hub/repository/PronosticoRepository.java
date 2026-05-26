@@ -10,7 +10,5 @@ public interface PronosticoRepository extends JpaRepository<Pronostico, Long> {
 
 	List<Pronostico> findByPartidoId(Long partidoId);
 
-	// 🔥 NUEVO: Buscar pronósticos de un usuario en una polla específica para sumar
-	// sus puntos
 	List<Pronostico> findByUsuarioUsernameAndPollaId(String username, Long pollaId);
 }

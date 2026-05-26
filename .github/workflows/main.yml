@@ -15,7 +15,7 @@ jobs:
     - name: 1. Descargar codigo del repositorio
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Requerido por SonarCloud para un mejor analisis
+        fetch-depth: 0
 
     - name: 2. Configurar JDK 17 (Java de tu proyecto)
       uses: actions/setup-java@v4
@@ -38,7 +38,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      # 🔥 AQUÍ ESTÁN TUS CLAVES EXACTAS DE SONARCLOUD
       run: mvn -B verify sonar:sonar -Dsonar.projectKey=drax210310_mundialhub -Dsonar.organization=drax210310 -Dsonar.host.url=https://sonarcloud.io
 
     - name: 6. Empaquetar Artefacto (JAR)

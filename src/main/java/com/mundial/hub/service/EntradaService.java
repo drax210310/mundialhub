@@ -22,7 +22,8 @@ import com.mundial.hub.repository.UsuarioRepository;
 public class EntradaService {
 
 	private static final Logger logger = LoggerFactory.getLogger(EntradaService.class);
-
+	@Autowired
+	private NotificacionService notificacionService;
 	@Autowired
 	private EntradaRepository entradaRepo;
 	@Autowired
@@ -32,9 +33,6 @@ public class EntradaService {
 	@Autowired
 	private EventoService eventoService;
 
-	// =============================
-	// RESERVAR (Con lógica de reciclaje y TTL en vivo)
-	// =============================
 	public Entrada reservarEntrada(Long partidoId, Authentication auth) {
 		Usuario usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();
 		Partido partido = partidoRepo.findById(partidoId).orElseThrow();
@@ -55,7 +53,6 @@ public class EntradaService {
 				}
 			}
 
-			// Reciclaje
 			entradaExistente.setEstado(EstadoEntrada.RESERVADA);
 			entradaExistente.setFechaReserva(ahora);
 
@@ -84,16 +81,10 @@ public class EntradaService {
 		return guardada;
 	}
 
-	// =============================
-	// MIS ENTRADAS
-	// =============================
 	public List<Entrada> misEntradas(Authentication auth) {
 		return entradaRepo.findByUsuarioUsername(auth.getName());
 	}
 
-	// =============================
-	// PAGO SIMULADO
-	// =============================
 	public Entrada pagarEntrada(Long entradaId, Authentication auth) {
 		Entrada entrada = entradaRepo.findById(entradaId).orElseThrow();
 
@@ -117,27 +108,20 @@ public class EntradaService {
 		return pagada;
 	}
 
-	// =============================
-	// TRANSFERIR ENTRADA (Control Antifraude)
-	// =============================
-	@SuppressWarnings("java:S5145")
 	public Entrada transferirEntrada(Long entradaId, String usernameDestino, Authentication auth) {
 		Entrada entrada = entradaRepo.findById(entradaId)
 				.orElseThrow(() -> new RuntimeException("Entrada no encontrada."));
 
-		// 1. Validar propiedad (Antifraude)
 		if (!entrada.getUsuario().getUsername().equals(auth.getName())) {
 			logger.error("Alerta Fraude: Usuario '{}' intentó transferir el ticket {} de otro usuario.", auth.getName(),
 					entradaId);
 			throw new RuntimeException("No eres el dueño de esta entrada.");
 		}
 
-		// 2. Validar estado de la entrada
 		if (entrada.getEstado() != EstadoEntrada.PAGADA) {
 			throw new RuntimeException("Solo puedes transferir entradas que ya estén pagadas.");
 		}
 
-		// 3. Buscar al destinatario
 		Usuario destinatario = usuarioRepo.findByUsername(usernameDestino)
 				.orElseThrow(() -> new RuntimeException("El usuario destino no existe. Verifique el username."));
 
@@ -145,11 +129,9 @@ public class EntradaService {
 			throw new RuntimeException("No puedes transferirte la entrada a ti mismo.");
 		}
 
-		// 4. Ejecutar transferencia
 		entrada.setUsuario(destinatario);
 		Entrada transferida = entradaRepo.save(entrada);
 
-		// 5. Registro de trazabilidad estricta
 		logger.info("Transferencia exitosa: Ticket ID {} pasó de '{}' a '{}'", entradaId, auth.getName(),
 				usernameDestino);
 		eventoService.registrar("ENTRADA_TRANSFERIDA",
@@ -158,9 +140,6 @@ public class EntradaService {
 		return transferida;
 	}
 
-	// =============================
-	// EXPIRACIÓN AUTOMÁTICA (TTL)
-	// =============================
 	@Scheduled(fixedRate = 60000)
 	public void expirarReservasVencidas() {
 		List<Entrada> todas = entradaRepo.findAll();
@@ -175,6 +154,10 @@ public class EntradaService {
 					logger.warn("Expiración TTL: Ticket ID {} expirado automáticamente", e.getId());
 					eventoService.registrar("RESERVA_EXPIRADA", "El sistema expiró automáticamente la reserva ID "
 							+ e.getId() + " del usuario " + e.getUsuario().getUsername());
+
+					String mensaje = "¡Atención! Tu reserva para el partido " + e.getPartido().getLocal() + " vs "
+							+ e.getPartido().getVisitante() + " ha expirado por falta de pago.";
+					notificacionService.enviarNotificacion(e.getUsuario(), mensaje, "ALERTA");
 				}
 			}
 		}

@@ -111,9 +111,8 @@ to {
 	</div>
 
 	<script>
-        // Escuchamos el evento 'submit' en lugar de un 'onclick'
         document.getElementById("registroForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Evita que la página se recargue automáticamente
+            event.preventDefault();
 
             var nombre = document.getElementById("nombre").value;
             var email = document.getElementById("email").value;
@@ -140,7 +139,6 @@ to {
                     alert("✅ Usuario registrado correctamente. Ya puedes iniciar sesión.");
                     window.location.href = "/login.html";
                 } else {
-                    // Si el servidor manda un error 400, extraemos el mensaje y lo mostramos
                     return res.text().then(function(mensajeError) {
                         alerta.innerText = "Error: " + mensajeError;
                         alerta.classList.remove("d-none");

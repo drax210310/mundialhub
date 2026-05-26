@@ -24,10 +24,6 @@ public class Entrada {
 	@JoinColumn(name = "partido_id")
 	private Partido partido;
 
-	// =====================================
-	// CONSTRUCTORES
-	// =====================================
-
 	public Entrada() {
 	}
 
@@ -36,10 +32,6 @@ public class Entrada {
 		this.partido = partido;
 		this.estado = EstadoEntrada.DISPONIBLE;
 	}
-
-	// =====================================
-	// GETTERS
-	// =====================================
 
 	public Long getId() {
 		return id;
@@ -60,10 +52,6 @@ public class Entrada {
 	public Partido getPartido() {
 		return partido;
 	}
-
-	// =====================================
-	// SETTERS
-	// =====================================
 
 	public void setId(Long id) {
 		this.id = id;

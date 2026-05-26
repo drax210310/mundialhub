@@ -22,8 +22,6 @@ public class AlbumService {
 	@Autowired
 	private OfertaMarketRepository ofertaRepo;
 
-	// --- MÉTODOS DE CONSULTA ---
-
 	public List<Lamina> misLaminas(Authentication auth) {
 		return usuarioRepo.findByUsername(auth.getName()).orElseThrow().getLaminas();
 	}
@@ -37,17 +35,13 @@ public class AlbumService {
 		return u.getMonedasCambio() != null ? u.getMonedasCambio() : 0;
 	}
 
-	// 🔥 ESTE ES EL MÉTODO QUE TE FALTABA (1)
 	public List<Lamina> todasLasLaminas() {
 		return laminaRepo.findAll();
 	}
 
-	// 🔥 ESTE ES EL MÉTODO QUE TE FALTABA (2)
 	public List<OfertaMarket> verMercadoComunidad() {
 		return ofertaRepo.findByActivaTrue();
 	}
-
-	// --- LÓGICA DE ECONOMÍA Y MERCADO ---
 
 	public void recargarMonedas(Integer cantidad, Authentication auth) {
 		Usuario usuario = usuarioRepo.findByUsername(auth.getName()).orElseThrow();

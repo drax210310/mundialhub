@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling // 🔥 NUEVO: Activa las tareas automáticas en segundo plano
+@EnableScheduling 
 public class HubApplication {
 
     public static void main(String[] args) {

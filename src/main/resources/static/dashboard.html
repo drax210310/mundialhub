@@ -113,9 +113,7 @@ body {
 
 	<script>
 
-// ==========================
-// 🔥 ESTADÍSTICAS
-// ==========================
+
 fetch("/api/entradas")
 .then(res => res.json())
 .then(data => {
@@ -134,11 +132,6 @@ fetch("/api/entradas")
     document.getElementById("pagadas").innerText = pag;
 });
 
-// ==========================
-// 🔐 CONTROL DE ROLES (MENÚ)
-// ==========================
-
-// EVENTOS (solo ADMIN)
 fetch("/api/eventos")
 .then(res => {
     if(res.status === 403){
@@ -146,7 +139,6 @@ fetch("/api/eventos")
     }
 });
 
-// USUARIOS (solo ADMIN)
 fetch("/api/usuarios")
 .then(res => {
     if(res.status === 403){
@@ -154,9 +146,6 @@ fetch("/api/usuarios")
     }
 });
 
-// ==========================
-// 👤 USUARIO LOGUEADO
-// ==========================
 fetch("/user")
 .then(res => res.json())
 .then(user => {

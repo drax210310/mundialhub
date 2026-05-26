@@ -138,9 +138,7 @@ body {
 	</div>
 
 	<script>
-        // ==========================================
-        // CARGAR DATOS AL INICIAR
-        // ==========================================
+
         function cargarPerfil() {
             fetch("/api/perfil")
                 .then(function(response) {
@@ -151,7 +149,6 @@ body {
                     }
                 })
                 .then(function(usuario) {
-                    // Inyectar datos en la interfaz
                     document.getElementById("displayNombre").innerText = usuario.nombre || "Usuario";
                     document.getElementById("displayUsername").innerText = "@" + (usuario.username || "username");
                     
@@ -166,9 +163,6 @@ body {
                 });
         }
 
-        // ==========================================
-        // GUARDAR CAMBIOS
-        // ==========================================
         function guardarPerfil() {
             var nombreEl = document.getElementById("nombreInput");
             var emailEl = document.getElementById("emailInput");
@@ -197,7 +191,7 @@ body {
             .then(function(response) {
                 if (response.ok) {
                     alert("✅ Perfil y preferencias actualizadas correctamente");
-                    cargarPerfil(); // Refrescar los textos de arriba
+                    cargarPerfil();
                 } else {
                     return response.text().then(function(detalleError) {
                         alert("❌ Servidor rechazó la actualización.\nCódigo: " + response.status + "\nDetalle: " + detalleError);
@@ -210,7 +204,6 @@ body {
             });
         }
 
-        // Ejecutar carga inicial automáticamente
         cargarPerfil();
     </script>
 </body>

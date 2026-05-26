@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.mundial.hub.model.*;
 import com.mundial.hub.repository.UsuarioRepository;
 import com.mundial.hub.repository.LaminaRepository;
-@SuppressWarnings("java:S2068")
 @Configuration
 public class DataLoader {
 
@@ -17,9 +16,6 @@ public class DataLoader {
 			LaminaRepository laminaRepo) {
 		return args -> {
 
-			// =========================================
-			// ADMIN
-			// =========================================
 			if (repo.findByUsername("admin").isEmpty()) {
 				Usuario admin = new Usuario();
 				admin.setNombre("Administrador");
@@ -31,9 +27,6 @@ public class DataLoader {
 				System.out.println("ADMIN CREADO");
 			}
 
-			// =========================================
-			// OPERADOR
-			// =========================================
 			if (repo.findByUsername("operador").isEmpty()) {
 				Usuario operador = new Usuario();
 				operador.setNombre("Operador");
@@ -45,9 +38,6 @@ public class DataLoader {
 				System.out.println("OPERADOR CREADO");
 			}
 
-			// =========================================
-			// USUARIO DE PRUEBA
-			// =========================================
 			if (repo.findByUsername("usuario").isEmpty()) {
 				Usuario usuario = new Usuario();
 				usuario.setNombre("Usuario de Prueba");
@@ -59,16 +49,12 @@ public class DataLoader {
 				System.out.println("USUARIO CREADO");
 			}
 
-			// =========================================
-			// LÁMINAS CON PRECIOS DINÁMICOS (10 Selecciones)
-			// =========================================
 			if (laminaRepo.count() == 0) {
 
-				// ARGENTINA
 				String bgArg = "74ACDF";
 				laminaRepo.save(new Lamina("Lionel Messi", "Argentina",
 						"https://ui-avatars.com/api/?name=Lionel+Messi&background=" + bgArg + "&color=fff&size=200",
-						15)); // 👑 Caro
+						15)); 
 				laminaRepo.save(new Lamina("Emiliano Martínez", "Argentina",
 						"https://ui-avatars.com/api/?name=Emiliano+Martinez&background=" + bgArg
 								+ "&color=fff&size=200",
@@ -84,7 +70,6 @@ public class DataLoader {
 								+ "&color=fff&size=200",
 						3));
 
-				// BRASIL
 				String bgBra = "FFDF00";
 				laminaRepo.save(new Lamina("Vinícius Jr", "Brasil",
 						"https://ui-avatars.com/api/?name=Vinicius+Jr&background=" + bgBra + "&color=000&size=200", 8));
@@ -114,7 +99,6 @@ public class DataLoader {
 						"https://ui-avatars.com/api/?name=Richard+Rios&background=" + bgCol + "&color=000&size=200",
 						3));
 
-				// FRANCIA
 				String bgFra = "002395";
 				laminaRepo.save(new Lamina("Kylian Mbappé", "Francia",
 						"https://ui-avatars.com/api/?name=Kylian+Mbappe&background=" + bgFra + "&color=fff&size=200",
@@ -134,7 +118,6 @@ public class DataLoader {
 						"https://ui-avatars.com/api/?name=Mike+Maignan&background=" + bgFra + "&color=fff&size=200",
 						3));
 
-				// ESPAÑA
 				String bgEsp = "AA151B";
 				laminaRepo.save(new Lamina("Rodri", "España",
 						"https://ui-avatars.com/api/?name=Rodri&background=" + bgEsp + "&color=F1BF00&size=200", 8));
@@ -150,7 +133,6 @@ public class DataLoader {
 						"https://ui-avatars.com/api/?name=Unai+Simon&background=" + bgEsp + "&color=F1BF00&size=200",
 						3));
 
-				// PORTUGAL
 				String bgPor = "FF0000";
 				laminaRepo.save(new Lamina("Cristiano Ronaldo", "Portugal",
 						"https://ui-avatars.com/api/?name=Cristiano+Ronaldo&background=" + bgPor
@@ -171,8 +153,6 @@ public class DataLoader {
 						"https://ui-avatars.com/api/?name=Rafael+Leao&background=" + bgPor + "&color=006600&size=200",
 						3));
 
-				// (Para ahorrar espacio, los otros 20 jugadores se autogenerarán por defecto
-				// con valor 3 al iniciar)
 				System.out.println("LÁMINAS CON PRECIOS DINÁMICOS CONFIGURADAS");
 
 				System.out.println("50 LÁMINAS CREADAS EXITOSAMENTE");

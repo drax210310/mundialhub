@@ -14,7 +14,6 @@ public class Lamina {
 	private String seleccion;
 	private String imagenUrl;
 
-	// 🔥 NUEVO: Precio dinámico del sistema para esta lámina
 	private Integer valorMercado = 3;
 
 	public Lamina() {
@@ -27,7 +26,6 @@ public class Lamina {
 		this.valorMercado = valorMercado;
 	}
 
-	// Getters y Setters
 	public Long getId() {
 		return id;
 	}

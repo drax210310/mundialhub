@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mundial.hub.model.Lamina;
 
-public interface LaminaRepository
-        extends JpaRepository<Lamina, Long> {
+public interface LaminaRepository extends JpaRepository<Lamina, Long> {
 
 }

@@ -24,10 +24,8 @@ public class Usuario {
 
 	private String rol;
 
-	// Monedas obtenidas por láminas repetidas
 	private Integer monedasCambio = 0;
 
-	// 🔥 NUEVO: Preferencias del usuario
 	private String equipoFavorito;
 	private String sedeFavorita;
 
@@ -62,10 +60,6 @@ public class Usuario {
 		this.rol = rol;
 		this.monedasCambio = 0;
 	}
-
-	// =====================================
-	// GETTERS Y SETTERS
-	// =====================================
 
 	public Long getId() {
 		return id;

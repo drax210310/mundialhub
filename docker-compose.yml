@@ -1,23 +1,27 @@
 version: '3.8'
-services:
-  db:
-    image: postgres:15
-    container_name: mundial-db
-    environment:
-      POSTGRES_DB: mundialhub
-      POSTGRES_USER: dsuar
-      POSTGRES_PASSWORD: David210310
-    ports:
-      - "5432:5432"
 
-  app:
-    build: .
-    container_name: mundial-app
-    ports:
-      - "8081:8081"
-    depends_on:
-      - db
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mundialhub
-      SPRING_DATASOURCE_USERNAME: dsuar
-      SPRING_DATASOURCE_PASSWORD: David210310
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.13
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logs:/usr/share/logstash/logs 
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.13
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch

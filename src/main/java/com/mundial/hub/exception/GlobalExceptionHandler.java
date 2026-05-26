@@ -12,25 +12,21 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-	// Atrapa errores de validación (ej. Correos malos)
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
 		return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
 	}
 
-	// Atrapa errores de lógica de negocio (ej. Saldo insuficiente)
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
 		return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
 	}
 
-	// Atrapa cualquier otro error crítico del servidor (ej. Caída de Base de Datos)
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
 		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado en el servidor.");
 	}
 
-	// Estructurador del JSON
 	private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());

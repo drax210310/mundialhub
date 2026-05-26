@@ -7,7 +7,6 @@ import com.mundial.hub.model.Partido;
 import com.mundial.hub.service.PartidoService;
 import com.mundial.hub.service.PartidoSyncService;
 import com.mundial.hub.service.PollaService;
-@SuppressWarnings("java:S4684")
 @RestController
 @RequestMapping("/api/partidos")
 @CrossOrigin(origins = "http://localhost:8081")

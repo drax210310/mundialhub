@@ -22,7 +22,6 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable()).headers(headers -> headers.frameOptions(frame -> frame.disable()))
 				.authorizeHttpRequests(auth -> auth
 
-						// 🔥 AQUÍ ESTÁN LAS RUTAS DE SWAGGER CORRECTAMENTE CONFIGURADAS
 						.requestMatchers("/", "/index.html", "/login.html", "/registro.html", "/css/**", "/js/**",
 								"/h2-console/**", "/api/usuarios/registro", "/api/partidos", "/swagger-ui.html",
 								"/swagger-ui/**", "/v3/api-docs/**")
@@ -34,7 +33,6 @@ public class SecurityConfig {
 						.requestMatchers("/dashboard-album.html").hasRole("USUARIO")
 						.requestMatchers("/dashboard-pollas.html").hasRole("USUARIO")
 
-						// RUTA PARA EL PERFIL
 						.requestMatchers("/perfil.html").hasRole("USUARIO")
 
 						.anyRequest().authenticated())

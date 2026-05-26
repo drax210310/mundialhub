@@ -249,41 +249,54 @@ body {
             document.getElementById("seccionPronosticos").style.display = "block";
             document.getElementById("seccionPronosticos").scrollIntoView({ behavior: "smooth" });
 
-            cargarPartidosDisponibles();
+            cargarPartidosDisponibles(idPolla);
             cargarRankingGrupo(idPolla);
         }
 
-        function cargarPartidosDisponibles() {
-            fetch("/api/partidos")
-                .then(function(res){ return res.json(); })
-                .then(function(partidos) {
-                    var html = "";
-                    partidos.forEach(function(p) {
-                        var infoResultado = p.estado === 'FINALIZADO' ? `<br><span class="badge bg-secondary">Resultado: ${p.golesLocal}-${p.golesVisitante}</span>` : "";
-                        
-                        html += `
-                            <tr>
-                                <td>
-                                    <span class="fw-bold">${p.local} vs ${p.visitante}</span>
-                                    ${infoResultado}
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <input type="number" min="0" class="form-control input-goles" id="golesL_${p.id}" value="0">
-                                        <span>-</span>
-                                        <input type="number" min="0" class="form-control input-goles" id="golesV_${p.id}" value="0">
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="btn btn-success btn-sm" onclick="guardarPronostico(${p.id})">
-                                        <i class="fa fa-save"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    document.getElementById("tablaPartidos").innerHTML = html;
+        function cargarPartidosDisponibles(idPolla) {
+            Promise.all([
+                fetch("/api/partidos").then(res => res.json()),
+                fetch(`/api/pollas/${idPolla}/mis-pronosticos`).then(res => res.json())
+            ])
+            .then(function([partidos, pronosticos]) {
+                var pronosticosMap = {};
+                pronosticos.forEach(function(pr) {
+                    if (pr.partido && pr.partido.id) {
+                        pronosticosMap[pr.partido.id] = pr;
+                    }
                 });
+
+                var html = "";
+                partidos.forEach(function(p) {
+                    var infoResultado = p.estado === 'FINALIZADO' ? `<br><span class="badge bg-secondary">Resultado: ${p.golesLocal}-${p.golesVisitante}</span>` : "";
+                    
+                    var pronosticoExistente = pronosticosMap[p.id];
+                    var golesL = pronosticoExistente ? pronosticoExistente.golesLocal : 0;
+                    var golesV = pronosticoExistente ? pronosticoExistente.golesVisitante : 0;
+
+                    html += `
+                        <tr>
+                            <td>
+                                <span class="fw-bold">${p.local} vs ${p.visitante}</span>
+                                ${infoResultado}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <input type="number" min="0" class="form-control input-goles" id="golesL_${p.id}" value="${golesL}">
+                                    <span>-</span>
+                                    <input type="number" min="0" class="form-control input-goles" id="golesV_${p.id}" value="${golesV}">
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-success btn-sm" onclick="guardarPronostico(${p.id})">
+                                    <i class="fa fa-save"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById("tablaPartidos").innerHTML = html;
+            });
         }
 
         // 🔥 NUEVA FUNCIÓN: TRAE LOS PUNTOS Y LOS USUARIOS DEL GRUPO EN ORDEN
@@ -323,7 +336,13 @@ body {
             fetch(`/api/pollas/pronosticar?pollaId=${pollaActivaId}&partidoId=${partidoId}&golesLocal=${golesL}&golesVisitante=${golesV}`, { method: "POST" })
                 .then(function(res) {
                     if (res.ok) {
-                        alert("¡Pronóstico guardado!");
+                        alert("✅ ¡Pronóstico guardado!");
+                    } else {
+                        res.json().then(errorData => {
+                            alert("❌ Acción bloqueada: " + errorData.message);
+                        }).catch(function() {
+                            alert("❌ Error desconocido al guardar el pronóstico.");
+                        });
                     }
                 });
         }

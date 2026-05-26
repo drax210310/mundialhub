@@ -36,22 +36,19 @@ public class AlbumServiceTest {
 
 	@Test
 	public void testAbrirSobreSinSaldoLanzaExcepcion() {
-		// Arrange (Preparar datos falsos)
 		Usuario usuarioFalso = new Usuario();
 		usuarioFalso.setUsername("juanito");
-		usuarioFalso.setMonedasCambio(2); // Solo tiene 2, el sobre cuesta 5
+		usuarioFalso.setMonedasCambio(2);
 
 		when(auth.getName()).thenReturn("juanito");
 		when(usuarioRepo.findByUsername("juanito")).thenReturn(Optional.of(usuarioFalso));
-		// Simulamos que hay láminas para evitar error de lista vacía
 		when(laminaRepo.findAll()).thenReturn(Collections.singletonList(new Lamina()));
 
-		// Act & Assert (Ejecutar y verificar que falle)
 		RuntimeException exception = assertThrows(RuntimeException.class, () -> {
 			albumService.abrirSobre(auth);
 		});
 
 		assertEquals("Saldo insuficiente.", exception.getMessage());
-		System.out.println("✅ Test pasado: El sistema bloqueó la compra por falta de saldo.");
+		System.out.println("Test pasado: El sistema bloqueó la compra por falta de saldo.");
 	}
 }

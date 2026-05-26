@@ -18,37 +18,31 @@ public class AlbumController {
     @Autowired
     private AlbumService service;
 
-    // Obtener las láminas que ya posee el usuario
     @GetMapping("/mis-laminas")
     public List<Lamina> misLaminas(Authentication auth) {
         return service.misLaminas(auth);
     }
 
-    // Obtener las láminas repetidas del usuario (para vender)
     @GetMapping("/mis-repetidas")
     public List<Lamina> misRepetidas(Authentication auth) {
         return service.misRepetidas(auth);
     }
 
-    // Consultar el saldo de monedas actual
     @GetMapping("/mis-monedas")
     public Integer misMonedas(Authentication auth) {
         return service.misMonedas(auth);
     }
 
-    // Listar todas las láminas existentes en el sistema (para la tienda)
     @GetMapping("/todas-laminas")
     public List<Lamina> todasLasLaminas() {
         return service.todasLasLaminas();
     }
 
-    // Ver las ofertas publicadas por otros usuarios en la comunidad
     @GetMapping("/comunidad")
     public List<OfertaMarket> verComunidad() {
         return service.verMercadoComunidad();
     }
 
-    // Comprar y abrir un sobre (Cuesta 5 monedas)
     @PostMapping("/abrir-sobre")
     public ResponseEntity<?> abrirSobre(Authentication auth) {
         try {
@@ -59,7 +53,6 @@ public class AlbumController {
         }
     }
 
-    // Comprar una lámina específica al sistema (Precio dinámico)
     @PostMapping("/comprar-sistema")
     public ResponseEntity<?> comprarSistema(@RequestParam Long laminaId, Authentication auth) {
         try {
@@ -70,7 +63,6 @@ public class AlbumController {
         }
     }
 
-    // Publicar una lámina repetida en el mercado de la comunidad
     @PostMapping("/publicar")
     public ResponseEntity<?> publicar(@RequestParam Long laminaId, @RequestParam Integer precio, Authentication auth) {
         try {
@@ -81,7 +73,6 @@ public class AlbumController {
         }
     }
 
-    // Comprar una lámina a otro usuario (P2P)
     @PostMapping("/comprar-p2p")
     public ResponseEntity<?> comprarP2P(@RequestParam Long ofertaId, Authentication auth) {
         try {
@@ -92,7 +83,6 @@ public class AlbumController {
         }
     }
 
-    // Recarga simulada de saldo
     @PostMapping("/recargar")
     public ResponseEntity<?> recargarMonedas(@RequestParam Integer cantidad, Authentication auth) {
         service.recargarMonedas(cantidad, auth);

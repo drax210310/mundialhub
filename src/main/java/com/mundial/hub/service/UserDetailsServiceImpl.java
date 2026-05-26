@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throws UsernameNotFoundException {
 
         System.out.println(
-                "🔥 Intentando login con: " + username
+                "Intentando login con: " + username
         );
 
         Usuario usuario = repo.findByUsername(username)

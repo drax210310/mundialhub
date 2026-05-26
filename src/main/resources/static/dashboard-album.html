@@ -61,10 +61,15 @@ body {
 			<div class="d-flex align-items-center gap-3">
 				<a href="/dashboard-usuario.html" class="btn btn-outline-primary"><i
 					class="fa fa-arrow-left"></i> Volver</a>
-				<button class="btn btn-success fw-bold shadow-sm"
-					onclick="simularRecarga()">
-					<i class="fa fa-credit-card"></i> Recargar
-				</button>
+				<div class="d-flex align-items-center gap-2">
+					<span class="badge bg-info text-dark shadow-sm py-2 px-3"> <i
+						class="fa fa-info-circle"></i> Gana monedas en las Pollas
+					</span>
+					<button class="btn btn-success fw-bold shadow-sm"
+						onclick="canjearCodigo()">
+						<i class="fa fa-gift"></i> Canjear Código
+					</button>
+				</div>
 				<span class="moneda-box shadow-sm"><i class="fa fa-coins"></i>
 					Monedas: <span id="saldoMonedas">0</span></span>
 			</div>
@@ -218,8 +223,24 @@ body {
         fetch(`/api/album/publicar?laminaId=${id}&precio=${precio}`, {method:"POST"}).then(res => res.ok ? (alert("¡Lámina puesta a la venta!"), cargarMisRepetidas()) : alert("Error"));
     }
 
-    function simularRecarga() {
-        fetch("/api/album/recargar?cantidad=20", {method:"POST"}).then(res => { inicializar(); });
+    function canjearCodigo() {
+        let codigo = prompt("Ingresa tu código promocional:");
+        
+        if (!codigo) return;
+        
+        if (codigo.toUpperCase() === "PROFE2026") {
+            fetch("/api/album/recargar?cantidad=20", {method:"POST"})
+            .then(res => { 
+                if(res.ok) {
+                    alert("✅ ¡Código aceptado! Has recibido 20 monedas promocionales.");
+                    inicializar();
+                } else {
+                    alert("❌ Error de red al canjear el código.");
+                }
+            });
+        } else {
+            alert("❌ Código inválido o expirado.");
+        }
     }
 
     inicializar();

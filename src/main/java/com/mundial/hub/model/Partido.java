@@ -16,8 +16,7 @@ public class Partido {
 	private String visitante;
 	private String fecha;
 
-	// 🔥 NUEVOS CAMPOS: Para saber si ya terminó y cuánto quedaron
-	private String estado = "PROGRAMADO"; // Puede ser PROGRAMADO o FINALIZADO
+	private String estado = "PROGRAMADO";
 	private Integer golesLocal;
 	private Integer golesVisitante;
 
@@ -35,9 +34,6 @@ public class Partido {
 		this.estado = "PROGRAMADO";
 	}
 
-	// =====================================
-	// GETTERS Y SETTERS
-	// =====================================
 	public Long getId() {
 		return id;
 	}

@@ -1,27 +1,22 @@
 package com.mundial.hub.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import com.mundial.hub.model.Notificacion;
 import com.mundial.hub.service.NotificacionService;
-@SuppressWarnings("java:S4684")
+
 @RestController
 @RequestMapping("/api/notificaciones")
+@CrossOrigin(origins = "http://localhost:8081")
 public class NotificacionController {
 
 	@Autowired
 	private NotificacionService service;
 
-	@GetMapping
-	public List<Notificacion> listar() {
-		return service.listar();
-	}
-
-	@PostMapping
-	public Notificacion crear(@RequestBody Notificacion n) {
-		return service.guardar(n);
+	@GetMapping("/mis-notificaciones")
+	public List<Notificacion> misNotificaciones(Authentication auth) {
+		return service.misNotificaciones(auth.getName());
 	}
 }

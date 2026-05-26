@@ -18,19 +18,17 @@ public class UsuarioServiceTest {
 
 	@Test
 	public void testRegistroCorreoInvalido() {
-		// Arrange
 		Usuario u = new Usuario();
 		u.setNombre("Carlos Perez");
 		u.setUsername("carlitos");
-		u.setEmail("correo-sin-arroba.com"); // Email inválido
+		u.setEmail("correo-sin-arroba.com");
 		u.setPassword("123456");
 
-		// Act & Assert
 		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
 			usuarioService.registrar(u);
 		});
 
 		assertTrue(ex.getMessage().contains("formato del correo electrónico no es válido"));
-		System.out.println("✅ Test pasado: El sistema rechazó el correo sin formato @.");
+		System.out.println("Test pasado: El sistema rechazó el correo sin formato @.");
 	}
 }

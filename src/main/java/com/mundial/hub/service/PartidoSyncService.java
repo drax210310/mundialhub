@@ -19,7 +19,6 @@ public class PartidoSyncService {
 	@Autowired
 	private EventoService eventoService;
 
-	// DTO interno para mapear el JSON de Mocki
 	public static class PartidoApiDTO {
 		public String local;
 		public String visitante;
@@ -30,12 +29,10 @@ public class PartidoSyncService {
 		logger.info("Iniciando proceso de sincronización externa...");
 		RestTemplate restTemplate = new RestTemplate();
 
-		// Selección de URL según el botón presionado
 		String apiUrl = forzarFalla ? "https://api-inexistente-mundial.com/error"
 				: "https://mocki.io/v1/7db6402a-efcb-4ec1-ac06-1c0c50b0e409";
 
 		try {
-			// Intento de consumo (Happy Path)
 			PartidoApiDTO[] partidosExternos = restTemplate.getForObject(apiUrl, PartidoApiDTO[].class);
 
 			if (partidosExternos != null && partidosExternos.length > 0) {
@@ -48,7 +45,6 @@ public class PartidoSyncService {
 			}
 
 		} catch (Exception e) {
-			// Degradación con gracia (Fallback) [cite: 52]
 			logger.warn("Falla detectada en el proveedor. Activando plan de contingencia.");
 			eventoService.registrar("ALERTA_API_EXTERNA",
 					"Falla de conexión con API. Se activó el plan de contingencia.");

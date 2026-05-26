@@ -32,7 +32,6 @@ public class EntradaController {
 		return service.pagarEntrada(entradaId, auth);
 	}
 
-	// 🔥 NUEVO: Endpoint para transferir entradas
 	@PostMapping("/transferir/{entradaId}")
 	public Entrada transferir(@PathVariable Long entradaId, @RequestParam String usernameDestino, Authentication auth) {
 		return service.transferirEntrada(entradaId, usernameDestino, auth);

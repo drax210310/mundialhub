@@ -36,8 +36,10 @@ public class PollaController {
 
 		return service.guardarPronostico(pollaId, partidoId, golesLocal, golesVisitante, auth);
 	}
-
-	// 🔥 NUEVO: Endpoint para consultar la tabla de posiciones
+		@GetMapping("/{pollaId}/mis-pronosticos")
+		public List<Pronostico> obtenerMisPronosticos(@PathVariable Long pollaId, Authentication auth) {
+			return service.obtenerMisPronosticos(pollaId, auth);
+		}
 	@GetMapping("/{pollaId}/ranking")
 	public List<UsuarioRankingDTO> obtenerRanking(@PathVariable Long pollaId) {
 		return service.obtenerRanking(pollaId);
